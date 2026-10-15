@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+"""Translator cursor streamer.
+
+Prints the Hyprland cursor position as "x, y" lines (~60 Hz) while alive.
+The floating window drag reads these lines because local pointer events go stale
+while the layer surface is being repositioned under the pointer. Started and
+killed by TranslatorWindow.qml around window drags.
+"""
+
+import glob
+import os
+import socket
+import sys
+import time
+
+xdg = os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}"
+sig = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE", "")
+
+paths = []
+if sig:
+    paths.append(os.path.join(xdg, "hypr", sig, ".socket.sock"))
+    paths.append(f"/tmp/hypr/{sig}/.socket.sock")
+paths.extend(glob.glob(os.path.join(xdg, "hypr", "*", ".socket.sock")))
+paths.extend(glob.glob("/tmp/hypr/*/.socket.sock"))
+
+socket_path = None
+for p in paths:
+    if os.path.exists(p):
+        socket_path = p
+        break
+
+if not socket_path:
+    sys.exit(1)
+
+while True:
+    try:
+        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        s.settimeout(0.1)
+        s.connect(socket_path)
+        s.sendall(b"cursorpos")
+        buf = b""
+        while True:
+            chunk = s.recv(64)
+            if not chunk:
+                break
+            buf += chunk
+        s.close()
+        text = buf.decode(errors="ignore").strip()
+        if "," in text:
+            sys.stdout.write(text + "\n")
+            sys.stdout.flush()
+    except Exception:
+        pass
+    time.sleep(0.016)

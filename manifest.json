@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "cjoy720.translator",
+  "name": "Translator",
+  "version": "1.0.0",
+  "author": "cjoy720",
+  "description": "Floating cursor translator: select text and translate with your choice of engine and target language right at your cursor.",
+  "kinds": [
+    "bar-widget",
+    "panel"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "panel": "Translator.qml"
+  },
+  "barWidget": {
+    "displayName": "Translator",
+    "description": "Floating cursor translator",
+    "category": "Utilities",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
