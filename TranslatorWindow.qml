@@ -854,17 +854,46 @@ Item {
               }
             }
 
-            // Speak / Listen Button
+            // Speak the source text, useful for checking English pronunciation.
             Rectangle {
               height: Style.space(28)
-              width: Style.space(28)
+              width: sourceSpeakLabel.implicitWidth + Style.space(16)
               radius: 6
+              opacity: controller && (controller.loading || controller.speaking) ? 0.5 : 1
+              color: sourceSpeakMouse.containsMouse ? Qt.rgba(Color.foreground.r, Color.foreground.g, Color.foreground.b, 0.14)
+                                                   : Qt.rgba(Color.foreground.r, Color.foreground.g, Color.foreground.b, 0.08)
+
+              Text {
+                id: sourceSpeakLabel
+                anchors.centerIn: parent
+                text: "󰕾 Source"
+                color: Color.foreground
+                font.family: Style.font.family
+                font.pixelSize: Style.font.caption
+              }
+
+              MouseArea {
+                id: sourceSpeakMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: if (controller) controller.speakSource()
+              }
+            }
+
+            // Speak the translated text.
+            Rectangle {
+              height: Style.space(28)
+              width: translatedSpeakLabel.implicitWidth + Style.space(16)
+              radius: 6
+              opacity: controller && (controller.loading || controller.speaking) ? 0.5 : 1
               color: speakMouse.containsMouse ? Qt.rgba(Color.foreground.r, Color.foreground.g, Color.foreground.b, 0.14)
                                               : Qt.rgba(Color.foreground.r, Color.foreground.g, Color.foreground.b, 0.08)
 
               Text {
+                id: translatedSpeakLabel
                 anchors.centerIn: parent
-                text: "󰕾"
+                text: "󰕾 Translation"
                 color: Color.foreground
                 font.family: Style.font.family
                 font.pixelSize: Style.font.caption
