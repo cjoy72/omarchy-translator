@@ -276,19 +276,38 @@ Item {
     textReplacer.running = true
   }
 
-  // Speaker
+  // Use online TTS and the local player for source and translated text.
   Process {
     id: speechProcess
     stdout: StdioCollector {}
     stderr: StdioCollector {}
+    onExited: function(code) {
+      if (code !== 0) {
+        speechNotification.running = true
+      }
+    }
+  }
+
+  Process {
+    id: speechNotification
+    command: ["omarchy-notification-send", "Speech playback failed", "Check your network connection and audio output, then try again."]
+  }
+
+  readonly property bool speaking: speechProcess.running
+
+  function speakText(text, language) {
+    if (!text || root.loading || speechProcess.running) return
+    speechProcess.command = ["python3", root.scriptPath("speak.py"),
+      "--text", text, "--language", language]
+    speechProcess.running = true
   }
 
   function speakTranslation() {
-    if (!root.translatedText) return
-    speechProcess.command = ["bash", "-c",
-      'if command -v /home/cjoy720/.local/bin/say >/dev/null 2>&1; then /home/cjoy720/.local/bin/say "$1" 2>/dev/null || true; fi',
-      "speaker", root.translatedText]
-    speechProcess.running = true
+    root.speakText(root.translatedText, root.targetLanguage)
+  }
+
+  function speakSource() {
+    root.speakText(root.sourceText, root.detectedSource)
   }
 
   function open() {
@@ -319,6 +338,8 @@ Item {
     function open(): void { root.open() }
     function close(): void { root.dismiss() }
     function toggle(): void { root.toggle() }
+    function speak(): void { root.speakTranslation() }
+    function speakSource(): void { root.speakSource() }
 
     function translateText(text: string, targetLang: string, engine: string): void {
       if (targetLang) root.targetLanguage = targetLang
@@ -339,6 +360,7 @@ Item {
       return JSON.stringify({
         opened: root.opened,
         loading: root.loading,
+        speaking: root.speaking,
         currentEngine: root.currentEngine,
         targetLanguage: root.targetLanguage,
         detectedSource: root.detectedSource,

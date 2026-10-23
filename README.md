@@ -15,7 +15,7 @@ A sleek, modern floating translator plugin for Omarchy / Hyprland. Like **OmaDro
 - 🌐 **Instant Language Switching**: Click the target language badge to open the visual language picker and translate to any language with 1 click.
 - 󰛔 **Replace Selection**: Click "Replace" to paste the translation directly over your selected text.
 - 󰆏 **One-Click Copy**: Copy translated text to your clipboard with instant animated confirmation.
-- 󰕾 **Speech / Audio**: Listen to pronunciation via TTS.
+- 󰕾 **Speech / Audio**: Listen to the source or translated text via Google TTS and the local `mpv` player.
 - ⌨️ **Keyboard Friendly**: Press `Esc` anytime to dismiss.
 - 📊 **Status Bar Widget**: Shows an icon on your top bar with the active target language badge (e.g. `ES`).
 
@@ -95,6 +95,9 @@ The plugin uses standard tools pre-installed on Omarchy:
 - `python3` (built-in standard library `urllib`, `json`, `socket`)
 - `wl-clipboard` (`wl-paste`, `wl-copy`)
 - `wtype` or `ydotool` (for text replacement synthesis)
+- `mpv` (for speech playback)
+
+Speech playback uses Google Translate's public TTS endpoint, so an internet connection is required. The plugin does not use a user-specific filesystem path; it resolves its own scripts from the installed plugin directory.
 
 ---
 
